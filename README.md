@@ -1,3 +1,5 @@
 # Constitutive Agents co-creating linguistic norms
 
-Honestly, the real deal is in `simulation.ipynb`. Just go there :)
+Each `.ipynb` file uses a different model of speakers' vocabularies. 
+
+Each one acts as a self-sufficient tutorial for the simulations contained.

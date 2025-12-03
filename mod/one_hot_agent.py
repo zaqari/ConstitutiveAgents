@@ -1,26 +1,7 @@
 import torch
+import numpy as np
 
-def tap(x):
-    print(x)
-    print()
-    return x
-
-def create_one_hot_vocabulary(agent, words_per_feature: int=2):
-    new_vocab = [torch.eye(agent.vocab.shape[-1]) for _ in  range(words_per_feature)]
-    new_vocab = torch.cat(new_vocab, dim=0)
-    new_vocab = torch.randn(size=new_vocab.shape) * new_vocab
-    new_var = ((new_vocab == 0).float() * .001) + ((new_vocab != 0).float() * .3)
-    new_obs = torch.FloatTensor([agent.obs.max()] * new_vocab.shape[0])
-
-    agent.vocab = new_vocab
-    agent.var = new_var
-    agent.obs = new_obs
-
-    return agent
-
-def create_ablated_vocabulary(agent, words_per_feature: int=2, dropout_rate: float=.2):
-    agent = create_one_hot_vocabulary(agent, words_per_feature)
-
+def create_ablated_vocabulary(agent, dropout_rate: float=.2):
     mask = torch.nn.Dropout(p=dropout_rate)
     mask = (mask(torch.ones(size=(agent.vocab.shape[0],))).view(-1) != 0).float()
 
@@ -30,26 +11,43 @@ def create_ablated_vocabulary(agent, words_per_feature: int=2, dropout_rate: flo
 
     return agent
 
+def complex_enforcement(agent, additional_permitted_features_per_word: int=1):
+
+    enforcement = agent.enforcement
+
+    additional_axes = [[i, np.random.choice((enforcement[i] == 0).nonzero().view(-1).numpy(), size=(additional_permitted_features_per_word,), replace=False)] for i in range(len(enforcement))]
+    for row_no, ones in additional_axes:
+        enforcement[row_no,ones] = 1.
+
+    agent.enforcement = enforcement
+    return agent
 
 class agent():
 
-    def __init__(self, vocab_size: int, semantic_dimensions: int, starting_observations: int=10, starting_uncertainty: float=.2):
+    def __init__(self, words_per_feature: int, semantic_dimensions: int, starting_observations: int=10, starting_uncertainty: float=.2, enforcing: bool=True):
         super(agent, self).__init__()
-        self.vocab = torch.randn(size=(vocab_size, semantic_dimensions))
-        self.obs = torch.FloatTensor([starting_observations]*vocab_size)
-        self.var = torch.FloatTensor([[starting_uncertainty] * semantic_dimensions]*vocab_size)
+
+        self.vocab = [torch.eye(semantic_dimensions)] * words_per_feature
+        self.vocab = torch.cat(self.vocab, dim=0)
+        self.vocab = torch.randn(size=self.vocab.shape) * self.vocab
+
+        self.var = ((self.vocab == 0).float() * .001) + ((self.vocab != 0).float() * .3)
+        self.obs = torch.FloatTensor([starting_observations]*self.vocab.shape[0])
+
+        self.enforcement = torch.ones(size=self.vocab.shape)
+        if enforcing:
+            self.enforcement = self.enforcement * (self.vocab != 0).float()
+
         self.unk_p = starting_uncertainty
 
     def __update(self, lexeme, env):
-        env_mask = (env != 0).float()
 
         # update semantic value
         new_obs_mu_update_by = env / (self.obs[lexeme] + 1)
         old_mu_update_by = (self.obs[lexeme] * self.vocab[lexeme]) / (self.obs[lexeme] * (self.obs[lexeme] + 1))
         mu_update_by = new_obs_mu_update_by - old_mu_update_by
 
-        # new_mu = self.vocab[lexeme] + (mu_update_by * env_mask)
-        new_mu = self.vocab[lexeme] + mu_update_by
+        new_mu = self.vocab[lexeme] + (mu_update_by * self.enforcement[lexeme])
 
         # update variance
         SSE = (self.obs.unsqueeze(-1) * self.var)[lexeme]
@@ -58,8 +56,7 @@ class agent():
         var_update_by += (self.obs[lexeme] * (mu_update_by**2)) / (self.obs[lexeme] + 1)
         var_update_by = torch.nan_to_num(var_update_by, nan=0.0, posinf=0.0, neginf=0.0)
 
-        # new_var = self.var[lexeme] + (var_update_by * env_mask)
-        new_var = self.var[lexeme] + var_update_by
+        new_var = self.var[lexeme] + (var_update_by * self.enforcement[lexeme])
 
         self.vocab[lexeme] = new_mu
         self.var[lexeme] = new_var
@@ -85,7 +82,9 @@ class agent():
     def listen(self, lexeme, env):
         self.__update(lexeme, env)
 
-    def add_vocab_item(self):
+    def add_vocab_item(self, feature_map):
         self.vocab = torch.cat([self.vocab, torch.zeros(1,self.vocab.shape[-1])], dim=0)
         self.obs = torch.cat([self.obs, torch.FloatTensor([1])], dim=0)
         self.var = torch.cat([self.var, torch.FloatTensor([[self.unk_p] * self.vocab.shape[-1]])])
+        self.enforcement = torch.cat([self.enforcement, torch.zeros(size=(1,self.enforcement.shape[-1]))], dim=0)
+        self.enforcement[-1,feature_map] = 1.
