@@ -99,10 +99,24 @@ class simple_social_network():
 
 class social_network():
 
-    def __init__(self, k_agents: int, connections_per_agent: int, vocab_size: int, semantic_dimensions: int, starting_observations: int=10, starting_uncertainty: float=.2):
+    def __init__(self, k_agents: int, connections_per_agent: int, vocab_size: int, semantic_dimensions: int, starting_observations: int=10, starting_uncertainty: float=.2, enforcing: bool=True):
         super(social_network, self).__init__()
+        # agent details
+        self.__connections_per_agent = connections_per_agent
+        self.__vocab_size = vocab_size
+        self.__semantic_dims = semantic_dimensions
+        self.__starting_obs = starting_observations
+        self.__unc = starting_uncertainty
+        self.__enforcement = enforcing
+
         self.agents = [
-            agent(vocab_size, semantic_dimensions, enforcing=True) for _ in range(k_agents)
+            agent(
+                vocab_size,
+                semantic_dimensions,
+                starting_observations=starting_observations,
+                starting_uncertainty=starting_uncertainty,
+                enforcing=enforcing
+            ) for _ in range(k_agents)
         ]
 
         self.graph = {
@@ -209,5 +223,26 @@ class social_network():
         self.agents[intiating_agent].vocab[-1][f] = env[0, f]
         self.agents[intiating_agent].var[-1] = torch.FloatTensor([1e-5] * self.agents[intiating_agent].var.shape[-1])
         self.agents[intiating_agent].var[-1][f] = .05
+
+    def add_new_agent(self, prob_connected_to_old_graph: float=.5):
+        self.agents += [
+            agent(
+                self.__vocab_size,
+                self.__semantic_dims,
+                starting_observations=self.__starting_obs,
+                starting_uncertainty=self.__unc,
+                enforcing=self.__enforcement
+            )
+        ]
+
+        # whether or not to add the new agent to the intragroup graph
+        #  of an older agent.
+        for i in self.graph.keys():
+            if np.random.rand() > prob_connected_to_old_graph:
+                self.graph[i] = np.append(self.graph[i], len(self.agents))
+
+        # create an intragroup graph for the current agent.
+        self.graph[len(self.agent)] = np.random.choice([j for j in range(len(self.agents)) if j != len(self.agents)], size=(self.__connections_per_agent,), replace=False)
+
 
 

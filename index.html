@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$']]
+    }
+  };
+</script>
+<style>
+body, html {
+  height: 100%;
+  margin: 0;
+  font: 400 15px/1.8 "Lato", sans-serif;
+  color: #777;
+}
+
+hr {
+  border-width: 3px;
+}
+
+.dataframe {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.dataframe thead tr {
+    background-color: #000a98;
+    color: #ffffff;
+    text-align: left;
+}
+
+.dataframe th,
+.dataframe td {
+    padding: 12px 15px;
+}
+
+.dataframe tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.dataframe tbody tr.fancy-row {
+    padding: 0px;
+    font-weight: bold;
+    background-color: #ffffff;
+    color: #000;
+}
+
+.dataframe tbody tr:last-of-type {
+    border-bottom: 2px solid #000a98;
+}
+
+.dataframe tbody tr.active-row {
+    font-weight: bold;
+    background-color: #000a98;
+    color: #ffffff;
+}
+
+a:link {
+  color: rgb(201, 178, 5);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: rgb(70, 5, 201);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+.bgimg-3 {
+  position: relative;
+  opacity: 0.65;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+}
+
+.bgimg-3 {
+  background-image: url("https://images.prismic.io/go-ucla-arts/a0aec97c-a26f-4e52-88be-4254fa4f9d06_DAY2_SHOT1_SCULPTUREGARDEN-113_r_cmyk.jpg");
+  min-height: 80%;
+}
+
+.grey-block{
+  color: white;
+  background-color: #777;
+  text-align: left;
+  padding: 50px 80px;
+}
+
+.grey-H3{
+  color: white;
+  text-align: right;
+}
+
+.white-block{
+  color: #777;
+  background-color: white;
+  text-align: left;
+  padding: 50px 80px;
+}
+
+.black-block{
+  color: white;
+  background-color: #000000;
+  text-align: left;
+  padding: 50px 80px;
+}
+
+.black-H3{
+  color: white;
+  text-align: right;
+}
+
+.white-H3{
+  color: #777;
+  text-align: right;
+}
+
+.caption {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  color: #000;
+}
+
+.caption span.border {
+  background-color: #111;
+  color: #fff;
+  padding: 18px;
+  font-size: 25px;
+  letter-spacing: 10px;
+}
+
+h3 {
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font: 20px "Lato", sans-serif;
+  color: #111;
+}
+
+/* Turn off parallax scrolling for tablets and phones */
+@media only screen and (max-device-width: 1024px) {
+  .bgimg-1, .bgimg-2, .bgimg-3 {
+    background-attachment: scroll;
+  }
+}
+</style>
+</head>
+<body>
+<div style="text-align: right; font-size: .75em;">
+  Dataset consolidation, statistical analyses, and data visualizations by <b><a href="https://zaqari.github.io" target="_blank">@ZP Rosen</a> (12/2025)</b>
+</div>
+<div class="bgimg-3" style="min-height: 50%;">
+  <div class="caption" id="title">
+    <span class="border">Constitutive agents overcoming a non-ergodic lexicon</span>
+  </div>
+</div>
+
+<div class="black-block">
+  <h3 class="black-H3">Methods/Project Overview</h3>
+  <br>
+    <p>The objective for this digital resource is to store a number of visualizations for various manipulations of speaker vocabularies and kinds of environments, as well as to link to a series of Google Colaboratory notebooks that can be used to run our code. The organization of each section is as follows:</p>
+          <ul>
+              <li>Each section is organized according to the way in which speakers' lexicons were organized.</li>
+              <li>Within each section, there is a link to a Google Colab Notebook that can be used to run the code/simulations demonstrated in that section.</li>
+              <li>Contained in each section, too, are a series of interactive Plotly plots, organized according to the kind of environmental manipulation we placed the agents in.</li>
+          </ul>
+          <p>Feel free to explore the contents of this page and play with our code! We hope you have fun with our work!</p>
+  <br><br>
+
+    <details>
+      <summary>&nbsp;&nbsp;<b>Formal model of lexico-semantic constraints and word learning</b></summary>
+      <p>We model agents as having a vocabulary consisting of tokens $w$ that can be used to refer to one or more features of speakers' social environments. Every feature is treated as continuously distributed, and we can refer to specific values of a feature $f$ at some time $t$ as $f_t$. </p>
+        <p>A word $w$ is selected on the basis of a speakers' belief about what values of $f$ a word is useful in invoking. Ergo, words are modeled as being selected via the Gaussian process below:</p>
+        <p>$$P_w(f_t) = \mathcal{N}_{w}(f_t | \mu_{f_t}, \sigma_{f_t}^2)$$</p>
+        <p>Importantly, speakers can update what values of a feature based observations of how other speakers use their own lexicons (for what values $f_t$ other speakers might use a word to refer to). Thus, a speaker's belief of what value $f_t$ a token is useful to refer to updates via the following:</p>
+        <p>$$\begin{align} \mu_{f_t} &= \mu_{f_{t-n}} + \left[ \Delta\mu_{f_t} \right] \\
+        \sigma^2_{f_t} &= \sigma^2_{f_{t-n}} + \left[ \Delta\sigma^2_{f_t} \right] \end{align}$$</p>
+        <p>And the values for $\left[ \Delta\mu_{f_t} \right]$ and $\left[ \Delta\sigma^2_{f_t} \right]$ are expressed as</p>
+        <p>$$\begin{align}\left[ \Delta \mu_{f_t} \right] =& \frac{f_t}{n_{f_{t-n}}+1} - \frac{\sum_n f_{t-n}}{n_{f_{t-n}}(n_{f_{t-n}} +1)} \\
+        \left[ \Delta \sigma^2_{f_t} \right] =& \frac{(f_t-\mu_{f_t})^2}{n_{f_{t-n}} + 1} - \frac{\sum ( f_{t-n} - \mu_{f_{t-n}})^2}{n_{f_{t-n}}(n_{f_{t-n}}+1)} + \left[ \Delta\mu_{f_t} \right]\frac{\sum (\left[ \Delta\mu_{f_t} \right] + 2 f_{t-n} - 2\mu_{f_{t-n}}   ) }{n_{f_{t-n}}+1}\end{align}$$</p>
+    </details>
+
+</div>
+
+
+
+  <div class="white-block">
+    <h3 class="white-H3">Dyad with unconstrained vocabulary-feature mapping</h3>
+    <p>Two agents are initialized who communicate with one another across several rounds. Importantly, words can be useful in invoking multiple possible features.</p>
+    <details>
+      <summary><b>Visualizations, and links to code</b></summary>
+      <p>You can <a href="https://drive.google.com/file/d/1bIPMC-xONxGn2UFIG05X0yXxZ-iFRZS6/view?usp=drive_link" target="_blank">run the code for each of these visualization here</a> </p>
+      <div>
+
+        <p><b>Randomly Generated Environment</b></p>
+        <embed src="./html/dy-allf/Randomly-Generated-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Randomly Generated Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-allf/Randomly-Generated-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment</b></p>
+        <embed src="./html/dy-allf/Suddenly-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-allf/Suddenly-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment</b></p>
+        <embed src="./html/dy-allf/Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-allf/Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment</b></p>
+        <embed src="./html/dy-allf/Suddenly-and-Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-allf/Suddenly-and-Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+      </div>
+    </details>
+  </div>
+
+
+
+
+
+  <div class="grey-block">
+    <h3 class="grey-H3">Dyad with 1-Hot Vocabulary</h3>
+    <p>Two agents are initialized who communicate with one another across several rounds. Importantly, each agent has a vocabulary wherein they have k words for each possible feature of something in their social environment.</p>
+    <details>
+      <summary><b>Visualizations, and links to code</b></summary>
+      <p>You can <a href="https://drive.google.com/file/d/1-ijtY8T0sbiY5CEz-INAnwv12J_bEey7/view?usp=drive_link" target="_blank">run the code for each of these visualization here</a> </p>
+      <div>
+
+        <p><b>Randomly Generated Environment</b></p>
+        <embed src="./html/dy-1hot/Randomly-Generated-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Randomly Generated Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-1hot/Randomly-Generated-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment</b></p>
+        <embed src="./html/dy-1hot/Suddenly-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-1hot/Suddenly-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment</b></p>
+        <embed src="./html/dy-1hot/Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-1hot/Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment</b></p>
+        <embed src="./html/dy-1hot/Suddenly-and-Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/dy-1hot/Suddenly-and-Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+      </div>
+    </details>
+  </div>
+
+
+
+
+
+  <div class="white-block">
+    <h3 class="white-H3">Social Network with 1-Hot Vocabulary</h3>
+    <p>Agents are initialized in a random, sparsely connected social network with k connections (k=5 for the visualizations provided). Each agent has a vocabulary such that every word can refer to a single possible feature. All agents have a preference for when they might use a word to refer to a value for a given feature.</p>
+    <details>
+      <summary><b>Visualizations, and links to code</b></summary>
+      <p>You can <a href="https://drive.google.com/file/d/1lzJvJE4ONlmRC5HsvMQHK7yADxoeIt8w/view?usp=drive_link" target="_blank">run the code for each of these visualization here</a> </p>
+      <div>
+
+        <p><b>Randomly Generated Environment</b></p>
+        <embed src="./html/sn-1hot/Randomly-Generated-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Randomly Generated Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot/Randomly-Generated-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment</b></p>
+        <embed src="./html/sn-1hot/Suddenly-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot/Suddenly-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment</b></p>
+        <embed src="./html/sn-1hot/Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot/Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment</b></p>
+        <embed src="./html/sn-1hot/Suddenly-and-Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot/Suddenly-and-Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+      </div>
+    </details>
+  </div>
+
+
+
+
+
+  <div class="grey-block">
+    <h3 class="grey-H3">Social Network with 1-Hot Vocabulary and unequal vocab knowledge</h3>
+    <p>Agents are initialized in a random, sparsely connected social network with k connections (k=5 for the visualizations provided). Each agent has a vocabulary such that every word can refer to a single possible feature. All agents have a preference for when they might use a word to refer to a value for a given feature. Some agents have no prior, however, on specific vocabulary item-feature mappings and are free to learn them through interaction.</p>
+    <details>
+      <summary><b>Visualizations, and links to code</b></summary>
+      <p>You can <a href="https://drive.google.com/file/d/1csg38cGRkV2Y3xjT8umBbgSc6Kzi84HN/view?usp=drive_link" target="_blank">run the code for each of these visualization here</a> </p>
+      <div>
+
+        <p><b>Randomly Generated Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Randomly-Generated-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Randomly Generated Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Randomly-Generated-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-and-Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-and-Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+      </div>
+    </details>
+  </div>
+
+
+
+
+
+  <div class="white-block">
+    <h3 class="white-H3">Social Network with 1-Hot Vocabulary and occasional shuffling of all vocabulary terms</h3>
+    <p>This is perhaps the most unrealistic scenario, but it demonstrates how constitutive proceses can still yield stable lexicons across agents. Agents are initialized in a random, sparsely connected social network with k connections (k=5 for the visualizations provided). Each agent has a vocabulary such that every word can refer to a single possible feature. All agents have a preference for when they might use a word to refer to a value for a given feature. Some agents have no prior, however, on specific vocabulary item-feature mappings and are free to learn them through interaction. Every so often, the agents' vocabularies are completely shuffled so that words refer to entirely new things at random.</p>
+    <details>
+      <summary><b>Visualizations, and links to code</b></summary>
+      <p>You can <a href="https://drive.google.com/file/d/1Z0t9JvKkikliSMRxYoXUyJcAs-YW9QLR/view?usp=drive_link" target="_blank">run the code for each of these visualization here</a> </p>
+      <div>
+
+        <p><b>Randomly Generated Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Randomly-Generated-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Randomly Generated Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Randomly-Generated-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-and-Stochastically-Changing-Environment.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+<br>
+<br>
+
+        <p><b>Suddenly and Stochastically Changing Environment and Introducing Novel Terms</b></p>
+        <embed src="./html/sn-1hot-ablated/Suddenly-and-Stochastically-Changing-Environment-and-Introducing-Novel-Terms.html" style="width: 100%; height: 500px; border: none;" frameBorder="0"/>
+
+      </div>
+    </details>
+  </div>
+
+
+
+<div class="bgimg-3" style="min-height: 35%;"></div>
+
+</body>
+</html>
