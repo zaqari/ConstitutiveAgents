@@ -2,6 +2,8 @@ import torch
 import numpy as np
 from .agent import agent as simple_agent
 from .one_hot_agent import agent as agent
+from .plot import heatmap
+
 
 class simple_social_network():
 
@@ -156,6 +158,13 @@ class social_network():
             heatmap += [row.unsqueeze(0)]
 
         return torch.cat(heatmap, dim=0)
+
+    def network_entropy(self):
+        H, k = [], len(self.agents)
+
+        for i in range(k):
+            H += [self.agents[i].H()]
+        return torch.FloatTensor(H)
 
     def similarity_heatmap(self):
         heatmap, k = [], len(self.agents)

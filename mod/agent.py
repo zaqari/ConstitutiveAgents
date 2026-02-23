@@ -68,7 +68,7 @@ class agent():
     def __log_likelihood(self, env):
         constant = 1 / (torch.sqrt(2 * torch.pi * self.var))
         observation = ((env - self.vocab) ** 2) / (2 * self.var)
-        return constant * (torch.exp(-observation))
+        return torch.log(constant * (torch.exp(-observation)))
 
     def access_log_like_bits(self, env):
         constant = 1 / (torch.sqrt(2 * torch.pi * self.var))
@@ -80,7 +80,6 @@ class agent():
         choices = torch.softmax(choices.sum(dim=-1) * lam, dim=-1)
 
         return torch.distributions.Categorical(probs=choices).sample(sample_shape=(1,))
-
 
     def listen(self, lexeme, env):
         self.__update(lexeme, env)

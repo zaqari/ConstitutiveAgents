@@ -78,6 +78,10 @@ class agent():
 
         return torch.distributions.Categorical(probs=choices).sample(sample_shape=(1,))
 
+    def H(self):
+        H = 2 * torch.pi * torch.exp(self.var)
+        H = .5 * torch.log(H)
+        return (self.enforcement * H).sum()
 
     def listen(self, lexeme, env):
         self.__update(lexeme, env)
